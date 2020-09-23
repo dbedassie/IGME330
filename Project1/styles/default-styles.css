@@ -1,0 +1,58 @@
+body{
+    background: linear-gradient(115deg, #D6FFF6 50%, #231651 50%);
+    font-family: 'Noto Sans JP', sans-serif;
+    text-align: center;
+    color: #A682FF;
+    text-shadow: 2px 2px #111;
+}
+
+#canvas {
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+h1, h2{
+    font-family: 'Roboto', sans-serif;
+}
+
+h1{
+    font-size: 3em;
+}
+
+h2{
+    font-size: 2em;
+}
+
+#pedalSizeButtons {
+    overflow-x: inherit;
+    text-align: center;
+    border: none;
+    padding-top: 0.5em;
+}
+
+header {
+    color: #A682FF;
+    text-align: center;
+    
+}
+
+.button {
+    font-family: 'Noto Sans JP', sans-serif;
+    margin-top: 1.5em;
+    text-align: center;
+    padding: 15px 32px;
+    display: inline-block;
+    text-decoration: none;
+    border: 20px #5F464B;
+}
+
+.slidecontainer{
+    margin: auto;
+    width: 50%;
+    padding: 10px;
+    padding-top: 10px;
+    background: #3F5E5A;
+}

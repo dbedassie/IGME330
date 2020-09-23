@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Phyllotaxy Clicker!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&family=Roboto&display=swap" rel="stylesheet">
+    <link href='styles/default-styles.css' rel='stylesheet' type='text/css'>
+    <script src="src/phyllo.js"></script>
+    <script src="src/dabLIB.js"></script>
+	<script src="src/index.js"></script>
+    
+</head>
+    
+<body>
+    <main>
+        <header>
+            <h1>Phyllotaxis Clicker</h1>
+            <h2>Click the screen for beautiful flowers!</h2>
+        </header>
+        
+        <canvas id="canvas"></canvas>
+            
+        <br>
+        
+            <section class="slidecontainer">
+            <fieldset data-role="controlgroup", data-type="horizontal" id="pedalSizeButtons">
+                <legend>Pedal Size:</legend>
+                
+                <label for="small">
+                Small
+                <input type="radio" id="small" name="pedalSize" value="small" onchange = "changePedalSize(this);">
+                </label>
+                
+                <label for="medium">
+                Medium
+                <input type="radio" checked="checked" id="medium" name="pedalSize" value="medium" onchange = "changePedalSize(this);">
+                </label>
+                
+                <label for="large">
+                Large
+                <input type="radio" id="large" name="pedalSize" value="large" onchange = "changePedalSize(this);">
+                </label>
+                
+                <label for="huge">
+                Huge
+                <input type="radio" id="huge" name="pedalSize" value="huge" onchange = "changePedalSize(this);">
+                </label>
+            </fieldset>
+                    <p>Speed: <span id="speed"></span></p>
+                    <input type="range" min="1" max="20" value="10" class="slider" id="speedRange">
+
+                    <p>Divergence: <span id="divergence"></span></p>
+                    <input type="range" min="100" max="200" value=138 step="0.1" class="slider" id="divergenceRange">
+
+                    <p>Padding: <span id="padding"></span></p>
+                    <input type="range" min="1" max="10" value=5 step="1" class="slider" id="paddingRange">
+
+                    <p>Pedal Amount: <span id="maxParticles"></span></p>
+                    <input type="range" min="25" max="250" value=50 step="1" class="slider" id="maxParticlesRange">
+                    
+                    <br>
+                    <button class="button" id = "clear">Clear Screen</button>
+        </section>
+        
+        <br>
+        
+    </main>
+    
+    <footer>Durrell Bedassie &copy; 2020 </footer>
+</body>
+    
+</html>
