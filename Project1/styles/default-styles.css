@@ -1,9 +1,9 @@
 body{
     background: linear-gradient(115deg, #D6FFF6 50%, #231651 50%);
     font-family: 'Noto Sans JP', sans-serif;
-    text-align: center;
+    text-align: left;
     color: #A682FF;
-    text-shadow: 2px 2px #111;
+    text-shadow: 1px 1px #111;
 }
 
 #canvas {
@@ -27,8 +27,7 @@ h2{
 }
 
 #pedalSizeButtons {
-    overflow-x: inherit;
-    text-align: center;
+    text-align: left;
     border: none;
     padding-top: 0.5em;
 }
@@ -49,10 +48,35 @@ header {
     border: 20px #5F464B;
 }
 
-.slidecontainer{
+#screenButtons{
     margin: auto;
+    padding: 13px;
+    width: 50%;
+    text-align: center;
+}
+
+.slidecontainer{
+    margin: left;
     width: 50%;
     padding: 10px;
-    padding-top: 10px;
-    background: #3F5E5A;
+    padding-top: 10px
+}
+
+#sliders{
+    margin: auto;
+    padding-left: 13px;
+}
+
+footer{
+    margin: auto;
+    width: 50%;
+    text-align: center;
+    color: #A682FF;
+}
+
+#phylloText{
+    margin: auto;
+    width: 50%;
+    text-align: center;
+    color: #A682FF;
 }

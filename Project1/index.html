@@ -21,7 +21,10 @@
         <canvas id="canvas"></canvas>
             
         <br>
-        
+        <div id='screenButtons'>
+            <button class="button" id="clear">Clear Screen</button>
+            <button class="button" id='export' onclick="doExport()">Export Image</button>
+        </div>
             <section class="slidecontainer">
             <fieldset data-role="controlgroup", data-type="horizontal" id="pedalSizeButtons">
                 <legend>Pedal Size:</legend>
@@ -46,6 +49,8 @@
                 <input type="radio" id="huge" name="pedalSize" value="huge" onchange = "changePedalSize(this);">
                 </label>
             </fieldset>
+                
+                <div id='sliders'>
                     <p>Speed: <span id="speed"></span></p>
                     <input type="range" min="1" max="20" value="10" class="slider" id="speedRange">
 
@@ -57,13 +62,28 @@
 
                     <p>Pedal Amount: <span id="maxParticles"></span></p>
                     <input type="range" min="25" max="250" value=50 step="1" class="slider" id="maxParticlesRange">
-                    
+                </div>
+                
                     <br>
-                    <button class="button" id="clear">Clear Screen</button>
-                    <button class="button" id='export' onclick="doExport()">Export Image</button>
+                    
         </section>
         
         <br>
+        
+        <div id='phylloText'>
+            <p>Phyllotaxis is the arrangement of leaves on a plant stem, hence why you create beautiful flowers on the screen!
+                <br>
+                Phyllotaxy is a class of nature and is an awesome, awesome phenomenon!
+                <br>
+                If you want to know more about phyllotaxy, check out the links below!
+                <br>
+                <a href='https://en.wikipedia.org/wiki/Phyllotaxis#:~:text=In%20botany%2C%20phyllotaxis%20or%20phyllotaxy,of%20leaves%20on%20a%20plant.'>Wikipedia</a>
+                <br>
+                <a href='http://algorithmicbotany.org/papers/abop/abop-ch4.pdf'>Algorithmic Botany Website</a>
+                <br>
+                <a href='https://mathworld.wolfram.com/Phyllotaxis.html'>Wolfram</a>
+            </p>
+        </div>
         
     </main>
     
