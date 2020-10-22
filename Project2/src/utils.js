@@ -38,4 +38,9 @@ const goFullscreen = (element) => {
 	// .. and do nothing if the method is not supported
 };
 
-export {makeColor, getRandomColor, getLinearGradient, goFullscreen};
+function lerp(a,b,n)
+{
+    return (b-a)*n+a;
+}
+
+export {makeColor, getRandomColor, getLinearGradient, goFullscreen, lerp};

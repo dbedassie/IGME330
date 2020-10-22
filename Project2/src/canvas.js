@@ -1,45 +1,181 @@
-/*
-	The purpose of this file is to take in the analyser node and a <canvas> element: 
-	  - the module will create a drawing context that points at the <canvas> 
-	  - it will store the reference to the analyser node
-	  - in draw(), it will loop through the data in the analyser node
-	  - and then draw something representative on the canvas
-	  - maybe a better name for this file/module would be *visualizer.js* ?
-*/
-
 import * as utils from './utils.js';
+import * as main from './main.js';
 
-let ctx,canvasWidth,canvasHeight,gradient,analyserNode,audioData;
 
+let ctx,canvasWidth,canvasHeight,gradient,analyserNode,audioData, waveformData, waveformHeight;
+let currentPTimer = 0, particles = [];
+const pTimer = 1, maxParticles = 100, pSpeed = 0.1;
 
 function setupCanvas(canvasElement,analyserNodeRef){
-	// create drawing context
 	ctx = canvasElement.getContext("2d");
 	canvasWidth = canvasElement.width;
 	canvasHeight = canvasElement.height;
-	// create a gradient that runs top to bottom
-	gradient = utils.getLinearGradient(ctx,0,0,0,canvasHeight,[{percent: 0.2, color: utils.makeColor(0, 0, 0, 1)}, {percent: .5, color: utils.makeColor(241, 162, 56, 1)}, {percent: .6, color: utils.makeColor(0, 0, 0, 1)}, {percent: 1, color: utils.makeColor(241, 162, 56, 1)}]);
-	// keep a reference to the analyser node
+	gradient = utils.getLinearGradient(ctx,0,0,0,canvasHeight,[{percent:1,color:"rgb(0,0,0)"},{percent:.5,color:"rgb(20,33,61)"},{percent:0,color:"rgb(252,163,17)"}]);
 	analyserNode = analyserNodeRef;
-	// this is the array where the analyser data will be stored
 	audioData = new Uint8Array(analyserNode.fftSize / 2);
+    waveformData = new Uint8Array(analyserNode.fftSize);
+    waveformHeight = new Int8Array(analyserNode.fftSize);
+}
+
+let Particle = function()
+{
+    this.animTimer = 1000;
+    
+    this.speed = { 
+        x: -5 + Math.random() * 10,
+        y: -5 + Math.random() * 10
+    };
+    
+    this.radius = Math.random() * 5;
+    
+    this.lifespan = 30 + Math.random() * 10;
+    this.lifespanRemain = this.lifespan;
+    
+    this.draw = ctx =>
+    {
+        let p = this;
+        
+        if(this.radius > 0)
+            {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${this.rgb[0]}, ${this.rgb[1]}, ${this.rgb[2]}, 1)`;
+                ctx.fill();
+                
+                p.lifespanRemain--;
+                p.radius -= 0.01;
+                p.x += p.speed.x;
+                p.y += p.speed.y;
+            }
+    }
+}
+
+function createParticle(x, y, color, l)
+{
+    let p = new Particle();
+    p.rgb = color;
+    p.x = x;
+    p.y = y;
+    p.start = Date.now();
+    particles.push(p);
 }
 
 function draw(params={}){
-  // 1 - populate the audioData array with the frequency data from the analyserNode
+    // populate the audioData array with the frequency data from the analyserNode
 	// notice these arrays are passed "by reference" 
 	analyserNode.getByteFrequencyData(audioData);
-	// OR
 	//analyserNode.getByteTimeDomainData(audioData); // waveform data
 	
-	// 2 - draw background
+	// Draw background
 	ctx.save();
     ctx.fillStyle = "black";
     ctx.globalAlpha = 0.1;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     ctx.restore();
     
-	// 3 - draw gradient
+    // Screen shake
+    if(params.screenShake)
+        {
+            let bass = (audioData[1] + audioData[2]) / 510;
+            
+            if(bass >= 0.75)
+                {
+                    main.beginShake(bass);
+                }
+        }
+    
+    // Particle effects around screen
+    ctx.save();
+    ctx.fillStyle = gradient;
+    if(params.showParticles)
+        {
+            if(currentPTimer >= pTimer)
+                {
+                    currentPTimer = 0;
+                }
+            else
+                {
+                    currentPTimer++;
+                }
+            
+            if(particles.length < maxParticles)
+                {
+                    createParticle(Math.random() * canvasWidth, Math.random() * canvasHeight, "white", main.averageLoudness);
+                }
+            
+            let multiply = main.averageLoudness / 3;
+            
+            for(let i = 0; i < particles.length; i++)
+                {
+                    // If particles go off screen, delete them.
+                    if(particles[i].radius <= 0 || particles[i].x < 0 || particles[i].y > canvasHeight || particles[i].y < 0)
+                        {
+                            particles.splice(i, 1);
+                        }
+                    
+                    // If left, move left. Or vice versa
+                    if(particles[i].x < canvasWidth / 2)
+                        {
+                            if(multiply > 10)
+                                {
+                                    particles[i].speed.x = -pSpeed * multiply;
+                                }
+                            else
+                                {
+                                    particles[i].speed.x = -pSpeed;
+                                }
+                        }
+                    else
+                        {
+                            if(multiply > 10)
+                                {
+                                    particles[i].speed.x = pSpeed * multiply;
+                                }
+                            else
+                                {
+                                    particles[i].speed.x = pSpeed;
+                                }
+                        }
+                    
+                    if(particles[i].y < canvasHeight / 2)
+                        {
+                            if(multiply > 10)
+                                {
+                                    particles[i].speed.y = -pSpeed * multiply;
+                                }
+                            else
+                                {
+                                    particles[i].speed.y = -pSpeed;
+                                }
+                        }
+                    else
+                        {
+                            if(multiply > 10)
+                                {
+                                    particles[i].speed.y = pSpeed * multiply;
+                                }
+                            else
+                                {
+                                    particles[i].speed.y = pSpeed;
+                                }
+                        }
+                    particles[i].draw(ctx);
+                    
+                    // Clean up screen
+                    if(i === particles.length - 1)
+                        {
+                            let percent = (Date.now() - particles[i].start) / particles[i].animTimer;
+                            
+                            if (percent > 1)
+                                {
+                                    particles = [];
+                                }
+                        }
+                }
+        }
+    ctx.restore();
+    
+	// Draw gradient
     if(params.showGradient)
         {
             ctx.save();
@@ -49,19 +185,47 @@ function draw(params={}){
             ctx.restore();
         }
 	
-	// 4 - draw bars
+    if(params.showCircles)
+        {
+            let maxRadius = canvasHeight / 4;
+            ctx.save();
+            ctx.globalAlpha = 0.5;
+            for(let i = 0; i < audioData.length; i++)
+                {
+                    // outer circle
+                    let percent = audioData[i] / 255;
+                    
+                    let circleRadius = percent * maxRadius;
+                    ctx.beginPath();
+                    ctx.fillStyle = utils.makeColor(20, 33, 61, .34 - percent / 3.0);
+                    ctx.arc(canvasWidth / 2, canvasHeight / 2, circleRadius * 1.5, 0, 2 * Math.PI, false);
+                    ctx.fill();
+                    ctx.closePath();
+                    
+                    // inner circles, smaller
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.fillStyle = utils.makeColor(252, 163, 17, 0.5 - percent / 5.0);
+                    ctx.arc(canvasWidth / 2, canvasHeight / 2, circleRadius * 0.5, 0, 2 * Math.PI, false);
+                    ctx.fill();
+                    ctx.closePath();
+                    ctx.restore();
+                }
+            ctx.restore();
+    
+	// Draw bars
     if(params.showBars)
         {
-            let barSpacing = 4;
-            let margin = 5;
+            let barSpacing = 10;
+            let margin = 20;
             let screenWidthForBars = canvasWidth - (audioData.length * barSpacing) - margin * 2;
             let barWidth = screenWidthForBars / audioData.length;
-            let barHeight = 200;
-            let topSpacing = 100;
+            let barHeight = 7;
+            let topSpacing = 510;
             
             ctx.save();
             ctx.fillStyle = utils.makeColor(255, 255, 255, 0.50);
-            ctx.strokeStyle = utils.makeColor(0, 0, 0, 0.50);
+            //ctx.strokeStyle = utils.makeColor(0, 0, 0, 0.50);
             // loop through the data and draw
             for(let i = 0; i < audioData.length; i++)
                 {
@@ -71,52 +235,15 @@ function draw(params={}){
             ctx.restore();
         }
 	
-	// 5 - draw circles
-    if(params.showCircles)
-        {
-            let maxRadius = canvasHeight / 4;
-            ctx.save();
-            ctx.globalAlpha = 0.5;
-            for(let i = 0; i < audioData.length; i++)
-                {
-                    // red-ish circles
-                    let percent = audioData[i] / 255;
-                    
-                    let circleRadius = percent * maxRadius;
-                    ctx.beginPath();
-                    ctx.fillStyle = utils.makeColor(255, 111, 111, .34 - percent / 3.0);
-                    ctx.arc(canvasWidth / 2, canvasHeight / 2, circleRadius * 1.5, 0, 2 * Math.PI, false);
-                    ctx.fill();
-                    ctx.closePath();
-                    
-                    // yellow-ish circles, smaller
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.fillStyle = utils.makeColor(200, 200, 0, 0.5 - percent / 5.0);
-                    ctx.arc(canvasWidth / 2, canvasHeight / 2, circleRadius * 0.5, 0, 2 * Math.PI, false);
-                    ctx.fill();
-                    ctx.closePath();
-                    ctx.restore();
-                }
-            ctx.restore();
+    
             
-            // 6 - bitmap manipulation
-            // TODO: right now. we are looping though every pixel of the canvas (320,000 of them!), 
-            // regardless of whether or not we are applying a pixel effect
-            // At some point, refactor this code so that we are looping though the image data only if
-            // it is necessary
-
-            // A) grab all of the pixels on the canvas and put them in the `data` array
-            // `imageData.data` is a `Uint8ClampedArray()` typed array that has 1.28 million elements!
-            // the variable `data` below is a reference to that array 
+            // Bitmap manipulation
             let imageData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
             let data = imageData.data;
             let length = data.length;
             let width = imageData.width; // not using here
-            // B) Iterate through each pixel, stepping 4 elements at a time (which is the RGBA for 1 pixel)
             for(let i = 0; i < length; i++)
                 {
-                    // C) randomly change every 20th pixel to red
                     if(params.showNoise && Math.random() < 0.05)
                         {
                             // data[i] is the red channel
@@ -125,16 +252,15 @@ function draw(params={}){
                             // data[i+3] is the alpha channel
                             data[i] = data[i + 1] = data[i + 2] = 0; // zero out the red and green and blue channels
                             data[i] = 65; // make the red channel 100% red
-                        } // end if
+                        }
                     if (params.showInvert)
                         {
                             let red = data[i], green = data[i + 1], blue = data[i + 2];
                             data[i] = 255 - red;    // set red value
                             data[i + 1] = 255 - green; // set green value
                             data[i + 2] = 255 - blue; // set blue value
-                            // data[i + 3] is the alpha but we're leaving that alone
                         }
-                } // end for
+                }
             if(params.showEmboss)
                 {
                     for(let i = 0; i < length; i++)
@@ -143,10 +269,9 @@ function draw(params={}){
                         data[i] = 127 + 2 * data[i] - data[i + 4] - data[i + width * 4];
                     }
                 }
-            // D) copy image data back to canvas
             ctx.putImageData(imageData, 0, 0);
         }
 		
 }
 
-export {setupCanvas,draw};
+export {setupCanvas, draw, ctx};

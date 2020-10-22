@@ -12,13 +12,19 @@ import * as audio from './audio.js';
 import * as canvas from './canvas.js';
 
 const drawParams = {
-    showGradient    :   false,
+    showGradient    :   true,
     showBars        :   true,
     showCircles     :   true,
     showNoise       :   false,
     showInvert      :   false,
-    showEmboss      :   false
+    showEmboss      :   false,
+    screenShake     :   false,
+    showParticles   :   true,
+    screenShake     :   false,
+    showWaveform    :   true
 };
+
+let averageLoudness;
 
 // 1 - here we are faking an enumeration
 const DEFAULTS = Object.freeze({
@@ -173,36 +179,90 @@ function setupUI(canvasElement){
                 drawParams.showEmboss = false;
             }
     }
+    
+    let partCB = document.querySelector('#partCB');
+    partCB.checked = drawParams.showParticles;
+    partCB.onchange = e => {
+        if(partCB.checked)
+            {
+                drawParams.showParticles = true;
+            }
+        else
+            {
+                drawParams.showParticles = false;
+            }
+    }
+    
+    let shakeCB = document.querySelector('#shakeCB');
+    shakeCB.checked = drawParams.screenShake;
+    shakeCB.onchange = e => {
+        if(shakeCB.checked)
+            {
+                drawParams.screenShake = true;
+            }
+        else
+            {
+                drawParams.screenShake = false;
+            }
+    }
 } // end setupUI
 
-function loop(){
-/* NOTE: This is temporary testing code that we will delete in Part II */
-	requestAnimationFrame(loop);
-    canvas.draw(drawParams);
-	// 1) create a byte array (values of 0-255) to hold the audio data
-	// normally, we do this once when the program starts up, NOT every frame
-	//let audioData = new Uint8Array(audio.analyserNode.fftSize/2);
-	
-	// 2) populate the array of audio data *by reference* (i.e. by its address)
-	//audio.analyserNode.getByteFrequencyData(audioData);
-	
-	// 3) log out the array and the average loudness (amplitude) of all of the frequency bins
-		//console.log(audioData);
-		
-		//console.log("-----Audio Stats-----");
-		//let totalLoudness =  audioData.reduce((total,num) => total + num);
-		//let averageLoudness =  totalLoudness/(audio.analyserNode.fftSize/2);
-		//let minLoudness =  Math.min(...audioData); // ooh - the ES6 spread operator is handy!
-		//let maxLoudness =  Math.max(...audioData); // ditto!
-		// Now look at loudness in a specific bin
-		// 22050 kHz divided by 128 bins = 172.23 kHz per bin
-		// the 12th element in array represents loudness at 2.067 kHz
-		//let loudnessAt2K = audioData[11]; 
-		//console.log(`averageLoudness = ${averageLoudness}`);
-		//console.log(`minLoudness = ${minLoudness}`);
-		//console.log(`maxLoudness = ${maxLoudness}`);
-		//console.log(`loudnessAt2K = ${loudnessAt2K}`);
-		//console.log("---------------------");
+// Screen shake: https://stackoverflow.com/questions/28023696/html-canvas-animation-which-incorporates-a-shaking-effect
+let shake = 1;
+let shakeStart = 0;
+let shakeTimer = 100;
+
+function preShake()
+{
+    let t = Date.now() - shakeStart;
+    
+    if(shakeStart == -1)
+        {
+            return;
+        }
+    if(t > shakeTimer)
+        {
+            shakeStart = -1;
+            return;
+        }
+    
+    let easyCo = t / shakeTimer;
+    let easy = (Math.pow(easyCo - 1, 3) + 1) * shake;
+    canvas.ctx.save();
+    let x = easy * (Math.cos(t * 0.1) + Math.cos(t * 0.3115)) * 15;
+    let y = easy * (Math.sin(t * 0.05) + Math.sin(t * 0.057113)) * 15;
+    canvas.ctx.translate(x, y);
 }
 
-export {init};
+function beginShake(shakeAmt)
+{
+    shakeStart = Date.now();
+    shake = shakeAmt;
+}
+
+function postShake()
+{
+    if(shakeStart == -1)
+        {
+            return;
+        }
+    canvas.ctx.restore();
+}
+
+function loop()
+    {
+        requestAnimationFrame(loop);
+        preShake();
+        canvas.draw(drawParams);
+        postShake();
+        let audioData = new Uint8Array(audio.analyserNode.fftSize/2);
+
+        audio.analyserNode.getByteFrequencyData(audioData);
+
+
+        let totalLoudness =  audioData.reduce((total,num) => total + num);
+        averageLoudness =  totalLoudness/(audio.analyserNode.fftSize/2);
+
+    }
+
+export {init, averageLoudness, beginShake};
