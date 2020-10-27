@@ -1,25 +1,32 @@
 body {
-	background: #eeeeee;
-	font-family: tahoma, verdana, sans serif;
+	font-family: 'Roboto Slab', serif;
     text-shadow: 1px 1px #111;
     background: linear-gradient(115deg, #000000 50%, #14213D 50%);
-    color: #FFF;
+    color: rgba(242, 163, 17, 1);
+    text-shadow: 2px 2px black;
+    font-size: 18px;
 }
 
 canvas {
-	display: block;
-    margin-right: auto;
-    margin-left: auto;
-    padding-left: 0;
-    padding-right: 0;
+	margin: 1rem;
+	margin-bottom: 1rem;
+	box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
+	background: #fafafa;
+    
+    margin: auto;
+    display: block;
+}
+
+#logo{
+    background-image: url('/media/CigsInsideLogo.png');
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
 }
 
 #controls{
-  margin-left: 1rem;
-}
-
-#volumeLabel{
-  margin-left: 1rem;
+    margin-left: 1rem;
+    font-family: 'Roboto Slab', serif;
 }
 
 section{
@@ -27,32 +34,157 @@ section{
     padding-top: 0.5em;
 }
 
+#trackSelect{
+    font-family: 'Roboto Slab', serif;
+}
+
 #playButton{
-  font-size: 1.2rem;
-  width: 6rem;
+    font-size: 1.2rem;
+    width: 8rem;
+    font-family: 'Roboto Slab', serif;
+}
+
+button{
+    font-family: 'Roboto Slab', serif;
+    display: inline-block;
+    padding: 5px;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    background-color: rgba(242,163,17, 0.8);
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px #000000;
+}
+
+button:hover{
+    background-color: rgba(242, 163, 17, 1);
 }
 
 button[data-playing="yes"]:after{
-  content: "Pause";
+    font-family: 'Roboto Slab', serif;
+    content: "Pause";
 }
 
 button[data-playing="no"]:after{
-  content: "Play";
+    font-family: 'Roboto Slab', serif;
+    content: "Play";
 }
 
 #fsButton{
-  font-size: 1.2rem;
-  width: 8rem;
+    font-size: 1.2rem;
+    width: 8rem;
+    font-family: 'Roboto Slab', serif;
 }
 
 h1{
     margin-top: 40px;
     justify-content: center;
     text-align: center;
+    font-family: 'PT Sans Narrow', sans-serif;
+    font-size: 45px;
+    text-shadow: 5px 5px rgb(20, 33, 61);
+    color: rgba(242, 163, 17, 1);
 }
 
-footer{
-    margin: auto;
-    width: 50%;
+#buttonCtrl{
+    font-family: 'PT Sans Narrow', sans-serif;
+}
+
+#timeNTrack{
+    font-family: 'PT Sans Narrow', sans-serif;
     text-align: center;
+    font-size: 20px;
+    padding-top: 1em;
+}
+
+#volumeCtrl{
+    font-family: 'PT Sans Narrow', sans-serif;
+}
+
+#audioCtrl{
+    line-height: 25pt;
+}
+
+#canvasCtrl{
+    line-height: 25pt;
+}
+
+#ctrls{
+    font-family: 'PT Sans Narrow', sans-serif;
+    height: 100%;
+    width: 200px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: rgba(20, 33, 61, 1);
+    overflow-x: hidden;
+    padding-top: 20px;
+}
+
+#ctrls h2{
+    font-family: 'PT Sans Narrow', sans-serif;
+    text-shadow: 5px 5px black;
+    text-align: center;
+    font-size: 32px;
+}
+
+#ctrls h3{
+    font-family: 'PT Sans Narrow', sans-serif;
+    text-shadow: 5px 5px black;
+    text-align: center;
+    font-size: 20px;
+}
+
+#bio{
+    text-align: center;
+    font-size: 15px;
+}
+
+#copy{
+    font-family: 'PT Sans Narrow', sans-serif;
+    margin: auto;
+    width: 100%;
+    text-align: center;
+    bottom: 0;
+    padding-bottom: 1.5em;
+    position: absolute;
+    text-shadow: 2px 2px black;
+}
+
+#ctrls img{
+    width: 80%;
+    height: auto;
+    text-align: center;
+    margin: auto;
+    display: block;
+}
+
+#spotify{
+    padding-top: 0.5em;
+    width: 75%;
+    height: auto;
+    text-align: center;
+    margin: auto;
+    display: block;
+}
+
+
+#instagram{
+    padding-top: 0.5em;
+    width: 45%;
+    height: auto;
+    text-align: center;
+    margin: auto;
+    display: block;
+}
+
+#facebook{
+    padding-top: 0.5em;
+    width: 40%;
+    height: auto;
+    text-align: center;
+    margin: auto;
+    display: block;
 }

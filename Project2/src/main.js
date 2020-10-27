@@ -9,7 +9,7 @@
 
 import * as utils from './utils.js';
 import * as audio from './audio.js';
-import * as canvas from './canvas.js';
+import {setupCanvas, draw, ctx} from './canvas.js';
 
 const drawParams = {
     showGradient    :   true,
@@ -21,23 +21,24 @@ const drawParams = {
     screenShake     :   false,
     showParticles   :   true,
     screenShake     :   false,
-    showWaveform    :   true
+    showLines       :   true
 };
 
 let averageLoudness;
+let highshelf = false, lowshelf = false;
+let time;
 
 // 1 - here we are faking an enumeration
 const DEFAULTS = Object.freeze({
-	sound1  :  "media/New Adventure Theme.mp3"
+	sound1  :  "media/TeenageRomance.mp3"
 });
 
 function init(){
-	console.log("init called");
-	console.log(`Testing utils.getRandomColor() import: ${utils.getRandomColor()}`);
     audio.setupWebAudio(DEFAULTS.sound1);
 	let canvasElement = document.querySelector("canvas"); // hookup <canvas> element
-    canvas.setupCanvas(canvasElement, audio.analyserNode);
+    setupCanvas(canvasElement, audio.analyserNode);
 	setupUI(canvasElement);
+    time = document.querySelector('#timeSlider');
     loop();
 }
 
@@ -102,6 +103,23 @@ function setupUI(canvasElement){
             }
     };
     
+    let hsCB = document.querySelector('#hsCB');
+    hsCB.checked = highshelf;
+    
+    let lsCB = document.querySelector('#lsCB');
+    lsCB.checked = lowshelf;
+    
+    hsCB.onchange = e => {
+        highshelf = e.target.checked;
+        audio.toggleHighshelf(highshelf);
+            
+    }
+    
+    lsCB.onchange = e => {
+        lowshelf = e.target.checked;
+        audio.toggleLowshelf(lowshelf);
+    }
+    
     let gradientCB = document.querySelector('#gradientCB');
     gradientCB.checked = drawParams.showGradient;
     gradientCB.onchange = e => {
@@ -113,6 +131,12 @@ function setupUI(canvasElement){
             {
                 drawParams.showGradient = false;
             }
+    }
+    
+    let waveformCB = document.querySelector('#waveCB');
+    waveformCB.checked = drawParams.showLines;
+    waveformCB.onchange = e => {
+        drawParams.showLines = e.target.checked;
     }
     
     let barsCB = document.querySelector('#barsCB');
@@ -207,53 +231,42 @@ function setupUI(canvasElement){
     }
 } // end setupUI
 
-// Screen shake: https://stackoverflow.com/questions/28023696/html-canvas-animation-which-incorporates-a-shaking-effect
-let shake = 1;
-let shakeStart = 0;
-let shakeTimer = 100;
+//Screen shake: https://stackoverflow.com/questions/28023696/html-canvas-animation-which-incorporates-a-shaking-effect
 
-function preShake()
-{
-    let t = Date.now() - shakeStart;
-    
-    if(shakeStart == -1)
-        {
-            return;
-        }
-    if(t > shakeTimer)
-        {
-            shakeStart = -1;
-            return;
-        }
-    
-    let easyCo = t / shakeTimer;
-    let easy = (Math.pow(easyCo - 1, 3) + 1) * shake;
-    canvas.ctx.save();
-    let x = easy * (Math.cos(t * 0.1) + Math.cos(t * 0.3115)) * 15;
-    let y = easy * (Math.sin(t * 0.05) + Math.sin(t * 0.057113)) * 15;
-    canvas.ctx.translate(x, y);
+let shakeDuration = 100;
+let shakeStartTime = 0;
+let shakeIntensity = 1;
+
+function preShake() {
+  if (shakeStartTime == -1) return;
+  let dt = Date.now() - shakeStartTime;
+  if (dt > shakeDuration) {
+      shakeStartTime = -1; 
+      return;
+  }
+  let easingCoef = dt / shakeDuration;
+  let easing = (Math.pow(easingCoef - 1, 3) + 1) * shakeIntensity;
+  ctx.save();  
+  let dx = easing * (Math.cos(dt * 0.1) + Math.cos( dt * 0.3115)) * 15;
+  let dy = easing * (Math.sin(dt * 0.05) + Math.sin(dt * 0.057113)) * 15;
+  ctx.translate(dx, dy);  
 }
 
-function beginShake(shakeAmt)
-{
-    shakeStart = Date.now();
-    shake = shakeAmt;
+function postShake() {
+  if (shakeStartTime ==-1) return;
+  ctx.restore();
 }
 
-function postShake()
-{
-    if(shakeStart == -1)
-        {
-            return;
-        }
-    canvas.ctx.restore();
+function startShake(intensity) {
+   shakeStartTime=Date.now();
+    shakeIntensity = intensity;
 }
 
 function loop()
     {
         requestAnimationFrame(loop);
         preShake();
-        canvas.draw(drawParams);
+        draw(drawParams);
         postShake();
         let audioData = new Uint8Array(audio.analyserNode.fftSize/2);
 
@@ -261,8 +274,14 @@ function loop()
 
 
         let totalLoudness =  audioData.reduce((total,num) => total + num);
-        averageLoudness =  totalLoudness/(audio.analyserNode.fftSize/2);
-
+        averageLoudness = totalLoudness/(audio.analyserNode.fftSize/2);
+        
+        if(time != audio.element.duration)
+            {
+                time.max = audio.element.duration;
+            }
+        time.value = audio.element.currentTime;
+        
     }
 
-export {init, averageLoudness, beginShake};
+export {init, averageLoudness, startShake};

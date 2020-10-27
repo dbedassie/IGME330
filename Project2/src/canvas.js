@@ -1,9 +1,10 @@
 import * as utils from './utils.js';
 import * as main from './main.js';
-
+import * as particle from './particle.js';
 
 let ctx,canvasWidth,canvasHeight,gradient,analyserNode,audioData, waveformData, waveformHeight;
-let currentPTimer = 0, particles = [];
+let currentPTimer = 0, currentLTimer = 0, particles = [], lines = [];
+const lTimer = 1, maxLines = 50, lSpeed = 0.1;
 const pTimer = 1, maxParticles = 100, pSpeed = 0.1;
 
 function setupCanvas(canvasElement,analyserNodeRef){
@@ -13,46 +14,13 @@ function setupCanvas(canvasElement,analyserNodeRef){
 	gradient = utils.getLinearGradient(ctx,0,0,0,canvasHeight,[{percent:1,color:"rgb(0,0,0)"},{percent:.5,color:"rgb(20,33,61)"},{percent:0,color:"rgb(252,163,17)"}]);
 	analyserNode = analyserNodeRef;
 	audioData = new Uint8Array(analyserNode.fftSize / 2);
-    waveformData = new Uint8Array(analyserNode.fftSize);
-    waveformHeight = new Int8Array(analyserNode.fftSize);
-}
-
-let Particle = function()
-{
-    this.animTimer = 1000;
-    
-    this.speed = { 
-        x: -5 + Math.random() * 10,
-        y: -5 + Math.random() * 10
-    };
-    
-    this.radius = Math.random() * 5;
-    
-    this.lifespan = 30 + Math.random() * 10;
-    this.lifespanRemain = this.lifespan;
-    
-    this.draw = ctx =>
-    {
-        let p = this;
-        
-        if(this.radius > 0)
-            {
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(${this.rgb[0]}, ${this.rgb[1]}, ${this.rgb[2]}, 1)`;
-                ctx.fill();
-                
-                p.lifespanRemain--;
-                p.radius -= 0.01;
-                p.x += p.speed.x;
-                p.y += p.speed.y;
-            }
-    }
+    waveformData = new Uint8Array(analyserNode.fftSize / 2);
+    waveformHeight = new Int8Array(analyserNode.fftSize / 2);
 }
 
 function createParticle(x, y, color, l)
 {
-    let p = new Particle();
+    let p = new particle.Particle();
     p.rgb = color;
     p.x = x;
     p.y = y;
@@ -64,7 +32,7 @@ function draw(params={}){
     // populate the audioData array with the frequency data from the analyserNode
 	// notice these arrays are passed "by reference" 
 	analyserNode.getByteFrequencyData(audioData);
-	//analyserNode.getByteTimeDomainData(audioData); // waveform data
+	analyserNode.getByteTimeDomainData(waveformData); // waveform data
 	
 	// Draw background
 	ctx.save();
@@ -73,15 +41,17 @@ function draw(params={}){
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     ctx.restore();
     
-    // Screen shake
-    if(params.screenShake)
+    ctx.save();
+    ctx.strokeStyle = gradient;
+
+    // Draw gradient
+    if(params.showGradient)
         {
-            let bass = (audioData[1] + audioData[2]) / 510;
-            
-            if(bass >= 0.75)
-                {
-                    main.beginShake(bass);
-                }
+            ctx.save();
+            ctx.fillStyle = gradient;
+            ctx.globalAlpha = 0.3;
+            ctx.fillRect(0,0, canvasWidth, canvasHeight);
+            ctx.restore();
         }
     
     // Particle effects around screen
@@ -100,7 +70,7 @@ function draw(params={}){
             
             if(particles.length < maxParticles)
                 {
-                    createParticle(Math.random() * canvasWidth, Math.random() * canvasHeight, "white", main.averageLoudness);
+                    createParticle(Math.random() * canvasWidth, Math.random() * canvasHeight, 'purple', main.averageLoudness);
                 }
             
             let multiply = main.averageLoudness / 3;
@@ -108,7 +78,7 @@ function draw(params={}){
             for(let i = 0; i < particles.length; i++)
                 {
                     // If particles go off screen, delete them.
-                    if(particles[i].radius <= 0 || particles[i].x < 0 || particles[i].y > canvasHeight || particles[i].y < 0)
+                    if(particles[i].radius <= 0 || particles[i].x < 0 || particles[i].x > canvasWidth ||particles[i].y > canvasHeight || particles[i].y < 0)
                         {
                             particles.splice(i, 1);
                         }
@@ -172,19 +142,46 @@ function draw(params={}){
                                 }
                         }
                 }
+            ctx.restore();
         }
     ctx.restore();
     
-	// Draw gradient
-    if(params.showGradient)
+    // Waveform lines
+    if(params.showLines)
         {
             ctx.save();
-            ctx.fillStyle = gradient;
-            ctx.globalAlpha = 0.3;
-            ctx.fillRect(0,0, canvasWidth, canvasHeight);
+            
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = `rgba(229, 229, 229, 0.5)`;
+            
+            ctx.beginPath();
+            
+            let x = 0;
+            let y = canvasHeight / 2;
+            let z = 0;
+            
+            for(let i = 0; i < waveformData.length; i++)
+                {
+                    x = (i / waveformData.length) * canvasWidth;
+                    z = (waveformData[i] - 128) * 5;
+                    waveformHeight[i] = utils.lerp(waveformHeight[i], z, 0.1);
+                    
+                    if (i == 0)
+                        {
+                            ctx.moveTo(x, y + waveformHeight[i]);
+                        }
+                    else
+                        {
+                            ctx.lineTo(x, y + waveformHeight[i]);
+                        }
+                }
+            ctx.stroke();
+            ctx.stroke();
+            
             ctx.restore();
         }
 	
+    // Show circles
     if(params.showCircles)
         {
             let maxRadius = canvasHeight / 4;
@@ -212,6 +209,7 @@ function draw(params={}){
                     ctx.restore();
                 }
             ctx.restore();
+        }
     
 	// Draw bars
     if(params.showBars)
@@ -234,8 +232,18 @@ function draw(params={}){
                 }
             ctx.restore();
         }
-	
     
+    // Screen shake
+    if(params.screenShake)
+        {
+            let bass = (audioData[1] + audioData[2]) / 510;
+            
+            if(bass >= 0.8)
+                {
+                    main.startShake(bass);
+                }
+        }
+
             
             // Bitmap manipulation
             let imageData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
@@ -270,8 +278,6 @@ function draw(params={}){
                     }
                 }
             ctx.putImageData(imageData, 0, 0);
-        }
-		
 }
 
 export {setupCanvas, draw, ctx};

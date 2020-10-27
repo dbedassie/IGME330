@@ -3,46 +3,78 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Audio Visualizer</title>
+    <link href="https://fonts.googleapis.com/css2?family=PT+Sans+Narrow:wght@700&family=Roboto+Slab&display=swap" rel="stylesheet">
 	<link href="styles/default-styles.css" type="text/css" rel="stylesheet" />
 	<script src="./src/loader.js" type="module"></script>
 </head>
 <body>
 <main>
-    <h1>Audio Visualizer</h1>
+    <h1>Cigs Inside's Audio Visualizer</h1>
 	<canvas width="1600" height="800"></canvas>
 	<div id="controls">
-		<section>
+		<section id="buttonCtrl">
 			<button id="playButton" data-playing="no"></button>
 			<button id="fsButton">Full Screen</button>
-		
-			<label>Track: 
-				<select id="trackSelect">
-					<option value="media/New Adventure Theme.mp3" selected>New Adventure Theme</option>
-					<option value="media/Peanuts Theme.mp3">Peanuts Theme</option>
-					<option value="media/The Picard Song.mp3">The Picard Song</option>
-				</select>
-			</label>
+            <section id="timeNTrack">
+                <label>Track: 
+                    <select id="trackSelect">
+                        <option value="media/TeenageRomance.mp3" selected>Teenage Romance</option>
+                        <option value="media/bastrds.mp3">bastrds</option>
+                        <option value="media/CigsInsideIsDead.mp3">Cigs Inside Is Dead</option>
+                    </select>
+                </label>
+                Time:<input type="range" id="timeSlider" min="0" max="2" value="0" step="0.01">
+                </section>
 		</section>
-		
-		<section>
-			Volume: <input type="range" id="volumeSlider" min="0" max="2" value="1" step="0.01">
-			<span id="volumeLabel">???</span>
-		</section>
-        
-        <section>
-              <span><input type="checkbox" id="gradientCB"><label for="gradientCB">Show Gradient</label></span>
-              <span><input type="checkbox" id="partCB"><label for="partCB">Show Particles</label></span>
-              <span><input type="checkbox" id="barsCB"><label for="barsCB">Show Bars</label></span>
-              <span><input type="checkbox" id="circlesCB"><label for="circlesCB">Show Circles</label></span>
-              <!-- we'll use this 4th checkbox soon! -->
-              <span><input type="checkbox" id="noiseCB"><label for="noiseCB">Show Noise</label></span>
-                <span><input type="checkbox" id="shakeCB"><label for="shakeCB">Screen Shake</label></span>
-                <span><input type="checkbox" id="invertCB"><label for="invertCB">Invert Colors</label></span>
-                <span><input type="checkbox" id="embossCB"><label for="embossCB">Emboss</label></span>
-            
+        <section id="volumeCtrl">
+            Volume:<input type="range" id="volumeSlider" min="0" max="2" value="1" step="0.01">
+            <span id="volumeLabel">???</span>
         </section>
+            <div id="logo"></div>
+
+        <div id="ctrls">
+            <img src='media/CigsInsideLogo.png'>
+            <h2>Controls</h2>
+            
+            <h3>Toggle Audio Controls</h3>
+            <section id="audioCtrl">
+                <input type="checkbox" id="hsCB"><label for="hsCB">Treble</label>
+                <br>
+                <input type="checkbox" id="lsCB"><label for="lsCB">Bass</label>
+            </section>
+            <h3>Visualizer Controls</h3>
+            <section id="canvasCtrl">
+                  <span><input type="checkbox" id="gradientCB"><label for="gradientCB">Show Gradient</label></span>
+                <br>
+                  <span><input type="checkbox" id="waveCB"><label for="waveCB">Show Waveform</label></span>
+                <br>
+                  <span><input type="checkbox" id="partCB"><label for="partCB">Show Particles</label></span>
+                <br>
+                  <span><input type="checkbox" id="barsCB"><label for="barsCB">Show Bars</label></span>
+                <br>
+                  <span><input type="checkbox" id="circlesCB"><label for="circlesCB">Show Circles</label></span>
+                <br>
+                  <span><input type="checkbox" id="noiseCB"><label for="noiseCB">Show Noise</label></span>
+                <br>
+                    <span><input type="checkbox" id="shakeCB"><label for="shakeCB">Screen Shake</label></span>
+                <br>
+                    <span><input type="checkbox" id="invertCB"><label for="invertCB">Black &amp; White</label></span>
+                <br>
+                    <span><input type="checkbox" id="embossCB"><label for="embossCB">Emboss</label></span>
+            
+            </section>
+            <p id='bio'>Cigs Inside is a local band in Rochester, NY! All music in this visualizer is theirs (mine)!
+                <br>
+                Learn more about us:
+                <a href="https://open.spotify.com/artist/6m0wiZrbUgvqZPabPW59qK" id='spotify'><img  src='media/spotify.png'></a>
+                <a href="https://www.instagram.com/cigsinsidetheband/?hl=en" id='instagram'><img src='media/instagram.png'></a>
+                <a href="https://www.facebook.com/cigsinside/" id='facebook'><img src='media/facebook.png'></a>
+            </p>
+            
+            <p id='copy'>Durrell Bedassie &copy;2020</p>
+            
+        </div>
 	</div>
 </main>
-    <footer>Durrell Bedassie &copy;2020</footer>
 </body>
 </html>
