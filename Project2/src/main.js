@@ -12,7 +12,7 @@ import * as audio from './audio.js';
 import {setupCanvas, draw, ctx} from './canvas.js';
 
 const drawParams = {
-    showGradient    :   true,
+    showGradient    :   false,
     showBars        :   true,
     showCircles     :   true,
     showNoise       :   false,
@@ -102,6 +102,17 @@ function setupUI(canvasElement){
                 playButton.dispatchEvent(new MouseEvent("click"));
             }
     };
+    
+    let upload = document.querySelector('#upload');
+    upload.onchange = e => {
+        const files = e.target.files;
+        audio.loadSoundFile(URL.createObjectURL(files[0]));
+        
+        if(playButton.dataset.playing = "yes")
+            {
+                playButton.dispatchEvent(new MouseEvent("click"));
+            }
+    }
     
     let hsCB = document.querySelector('#hsCB');
     hsCB.checked = highshelf;
@@ -229,6 +240,8 @@ function setupUI(canvasElement){
                 drawParams.screenShake = false;
             }
     }
+    
+    
 } // end setupUI
 
 //Screen shake: https://stackoverflow.com/questions/28023696/html-canvas-animation-which-incorporates-a-shaking-effect

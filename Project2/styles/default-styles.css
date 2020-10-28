@@ -1,7 +1,11 @@
 body {
 	font-family: 'Roboto Slab', serif;
-    text-shadow: 1px 1px #111;
-    background: linear-gradient(115deg, #000000 50%, #14213D 50%);
+    background: linear-gradient(115deg, #E5E5E5 50%, #000000 50%);
+    background-image: url("../media/cigsinsidegif.gif");
+    background-repeat: no-repeat;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
     color: rgba(242, 163, 17, 1);
     text-shadow: 2px 2px black;
     font-size: 18px;
@@ -12,13 +16,12 @@ canvas {
 	margin-bottom: 1rem;
 	box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
 	background: #fafafa;
-    
     margin: auto;
     display: block;
 }
 
 #logo{
-    background-image: url('/media/CigsInsideLogo.png');
+    background-image: url('../media/CigsInsideLogo.png');
     position: absolute;
     bottom: 0px;
     right: 0px;
@@ -78,12 +81,12 @@ button[data-playing="no"]:after{
 }
 
 h1{
-    margin-top: 40px;
+    margin-top: 20px;
     justify-content: center;
     text-align: center;
     font-family: 'PT Sans Narrow', sans-serif;
     font-size: 45px;
-    text-shadow: 5px 5px rgb(20, 33, 61);
+    text-shadow: 3px 3px rgb(20, 33, 61);
     color: rgba(242, 163, 17, 1);
 }
 
@@ -95,7 +98,8 @@ h1{
     font-family: 'PT Sans Narrow', sans-serif;
     text-align: center;
     font-size: 20px;
-    padding-top: 1em;
+    padding-top: 0em;
+    display: contents;
 }
 
 #volumeCtrl{
@@ -103,11 +107,11 @@ h1{
 }
 
 #audioCtrl{
-    line-height: 25pt;
+    line-height: 19pt;
 }
 
 #canvasCtrl{
-    line-height: 25pt;
+    line-height: 19pt;
 }
 
 #ctrls{
@@ -118,7 +122,7 @@ h1{
     z-index: 1;
     top: 0;
     left: 0;
-    background-color: rgba(20, 33, 61, 1);
+    background-color: #000000;
     overflow-x: hidden;
     padding-top: 20px;
 }
@@ -187,4 +191,11 @@ h1{
     text-align: center;
     margin: auto;
     display: block;
+}
+
+#upload{
+    font-family: 'PT Sans Narrow', sans-serif;
+    font-size: 18px;
+    text-shadow: 2px 2px black;
+    bottom: 0;
 }

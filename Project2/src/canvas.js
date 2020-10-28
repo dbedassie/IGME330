@@ -187,22 +187,31 @@ function draw(params={}){
             let maxRadius = canvasHeight / 4;
             ctx.save();
             ctx.globalAlpha = 0.5;
-            for(let i = 0; i < audioData.length; i++)
+            for(let i = 0; i < audioData.length / 100; i++)
                 {
-                    // outer circle
                     let percent = audioData[i] / 255;
                     
                     let circleRadius = percent * maxRadius;
                     ctx.beginPath();
-                    ctx.fillStyle = utils.makeColor(20, 33, 61, .34 - percent / 3.0);
-                    ctx.arc(canvasWidth / 2, canvasHeight / 2, circleRadius * 1.5, 0, 2 * Math.PI, false);
+                    ctx.fillStyle = utils.makeColor(252, 163, 17, .34 - percent / 3.0);
+                    ctx.arc(canvasWidth / 2, canvasHeight / 2, circleRadius, 0, 2 * Math.PI, false);
                     ctx.fill();
                     ctx.closePath();
                     
-                    // inner circles, smaller
+                    // outer bigger
                     ctx.save();
                     ctx.beginPath();
-                    ctx.fillStyle = utils.makeColor(252, 163, 17, 0.5 - percent / 5.0);
+                    ctx.fillStyle = utils.makeColor(20, 33, 61, 0.15 - percent / 10.0);
+                    ctx.arc(canvasWidth / 2, canvasHeight / 2, circleRadius * 1.5, 0, 2 * Math.PI, false);
+                    ctx.fill();
+                    ctx.closePath();
+                    ctx.restore();
+                    
+                    
+                    // inner smaller
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.fillStyle = utils.makeColor(299, 299, 299, 0.3 - percent / 5.0);
                     ctx.arc(canvasWidth / 2, canvasHeight / 2, circleRadius * 0.5, 0, 2 * Math.PI, false);
                     ctx.fill();
                     ctx.closePath();
